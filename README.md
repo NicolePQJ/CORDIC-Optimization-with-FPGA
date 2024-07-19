@@ -6,7 +6,7 @@ y = \sum_{i=1}^{N} 0.5* x_{i}+x_{i}^2 * cos(\frac{x_{i}-128}{128})
 $$
 
 ### Performance:
-need to include a graph
+![Local Image](images/Picture1.png)
 
 ### Baseline System: 
 All arithmetic calculations are implemented within the Nios II processor with only addition/subtraction support, which has 2kbytes each for instruction cache and data cache.
