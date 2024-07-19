@@ -1,0 +1,12 @@
+.metadata/
+db/
+everything_else/
+f/
+fp_multi/
+greybox_tmp/
+incremental_db/
+mult_sim/
+RemoteSystemsTempFiles/
+simulation/
+sub_sim/
+system/

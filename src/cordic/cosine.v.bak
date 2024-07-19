@@ -1,0 +1,90 @@
+module cosine #(parameter STAGES = 10)
+(
+  input                   clk,
+  input signed [31:0]     theta, // Input angle in Q2.30 format
+
+  output reg              done,
+  output signed [31:0]    result // Output cosine in Q2.30 format
+);
+
+  // Internal variables
+  reg signed [31:0]       x;
+  reg signed [31:0]       y;
+  reg signed [31:0]       z;
+
+  // Constants
+  reg signed [31:0] angle_table [0:STAGES];
+  initial begin
+    // Precompute arctangent values for CORDIC iterations
+    angle_table[0] = 32'b00110010010000111111011001100100;
+    //Q2.30
+    angle_table[1] = 32'b00011101101011000110011100000101;
+    angle_table[2] = 32'b00001111101011011011101011111001;
+    angle_table[3] = 32'b00000111111101010110111010100001;
+    angle_table[4] = 32'b00000011111111101010101101110110;
+    angle_table[5] = 32'b00000001111111111101010101011011;
+    angle_table[6] = 32'b00000000111111111111101010101010;
+    angle_table[7] = 32'b00000000011111111111111101010101;
+    angle_table[8] = 32'b00000000001111111111111111101010;
+    angle_table[9] = 32'b00000000000111111111111111111101;
+    angle_table[10] = 32'b00000000000011111111111111111111;
+
+    //Q8.24
+    // angle_table[1] = 32'b00000000011101101011000110011100;
+    // angle_table[2] = 32'b00000000001111101011011011101011;
+    // angle_table[3] = 32'b00000000000111111101010110111010;
+    // angle_table[4] = 32'b00000000000011111111101010101101;
+    // angle_table[5] = 32'b00000000000001111111111101010101;
+    // angle_table[6] = 32'b00000000000000111111111111101010;
+    // angle_table[7] = 32'b00000000000000011111111111111101;
+    // angle_table[8] = 32'b00000000000000001111111111111111;
+    // angle_table[9] = 32'b00000000000000000111111111111111;
+    // angle_table[10] = 32'b00000000000000000011111111111111;
+
+
+    x = 32'b00100110110111010011101111010000; // Initialize x with cosine value of 0
+    //x = 32'b00000000100110110111010011101111;
+    y = 0.0; // Initialize y with sine value of 0
+    z = 0; // Initialize z with input angle
+  end
+
+  reg [3:0] count = 0;
+  always @ (posedge clk) begin
+    count = count + 1;
+  end
+
+
+  // CORDIC algorithm
+  always @(posedge clk) begin
+    if (count == 1) begin
+	   z = theta;
+	end
+	else begin
+    if (z < 0) begin
+    x = x + (y >> (count-2));
+    y = y - (x >> (count-2));
+    z = z + angle_table[count-2];
+    end else begin
+    x = x - (y >> (count-2));
+    y = y + (x >> (count-2));
+    z = z - angle_table[count-2];
+    end
+	 end
+  end
+
+  // Output cosine value
+  assign result = x[31:0];
+  
+  
+  always@(*) begin
+    if (count == STAGES) begin
+    done = 1;
+	 end
+	 else begin
+	 done = 0;
+	 end
+  end
+	
+  
+
+endmodule
