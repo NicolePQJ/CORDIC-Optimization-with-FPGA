@@ -17,4 +17,3 @@ All arithmetic calculations are implemented within the Nios II processor with on
 - add multiplier support
 - add customized single precision floating point support
 - add cusomized CORDIC implementation for evaluation of cosine and optimize the block for latency and throughput
-- add DMA support
